@@ -45,6 +45,8 @@ final class CommandeController extends AbstractController
             $entityManager->persist($commande);
             $entityManager->flush();
 
+            $this->addFlash('success', 'Commande enregistrée avec succès !');
+
             return $this->redirectToRoute('app_commande_index');
         }
 
@@ -75,6 +77,8 @@ final class CommandeController extends AbstractController
     #[Route('/{id}/edit', name: 'app_commande_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Commande $commande, EntityManagerInterface $entityManager): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $form = $this->createForm(CommandeType::class, $commande);
         $form->handleRequest($request);
 

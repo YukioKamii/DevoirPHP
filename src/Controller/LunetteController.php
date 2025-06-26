@@ -53,6 +53,8 @@ final class LunetteController extends AbstractController
     #[Route('/{id}/edit', name: 'app_lunette_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Lunette $lunette, EntityManagerInterface $entityManager): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $form = $this->createForm(LunetteForm::class, $lunette);
         $form->handleRequest($request);
 

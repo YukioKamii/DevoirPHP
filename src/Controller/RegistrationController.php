@@ -26,7 +26,7 @@ final class RegistrationController extends AbstractController
                 $form->get('plainPassword')->getData()
             );
             $user->setPassword($hashedPassword);
-            $user->setRoles(['ROLE_ADMIN']); // ou ['ROLE_USER'] selon ce que tu veux
+            $user->setRoles(['ROLE_USER']); // ou ['ROLE_ADMIN'] pour créer un administrateur
 
             $em->persist($user);
             $em->flush();

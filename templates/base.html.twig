@@ -1,37 +1,69 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
-
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
-    </head>
-    <body>
-        {% if app.user %}
-            <nav style="padding: 1em; background: #eee; display: flex; gap: 1em;">
-                <a href="{{ path('app_home') }}">🏠 Accueil</a>
-                <a href="{{ path('app_categorie_index') }}">📦 Catégories</a>
-                <a href="{{ path('app_lunette_index') }}">🕶 Lunettes</a>
-
-                <div style="margin-left:auto;">
-                    {% if app.user %}
-                        👤 {{ app.user.email }}
-                        {% if is_granted('ROLE_ADMIN') %}
-                            <span style="color: red; font-weight: bold;">(Admin)</span>
-                        {% else %}
-                            <span style="color: blue; font-weight: bold;">(Utilisateur)</span>
-                        {% endif %}
-                        <a href="{{ path('app_commande_user') }}">📦 Mes commandes</a>
-                        <a href="{{ path('app_logout') }}" style="margin-left: 1em;">🚪 Déconnexion</a>
-                    {% endif %}
-                </div>
-            </nav>
+  <head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Opticien{% endblock %}</title>
+    {% block stylesheets %}
+      <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+      <style>
+        body{font-family:'Roboto',sans-serif;color:#333;background:#F5F5F5;margin:0;padding:0;}
+        header{background:#6ec6ff;padding:1rem;}
+        nav a{margin-right:1rem;font-weight:500;color:#fff;}
+        nav a:hover{opacity:0.8;}
+        .active{border-bottom:2px solid #fff;}
+        .container{max-width:1200px;margin:2rem auto;padding:0 1rem;}
+        footer{background:#005C99;color:#fff;padding:1rem;text-align:center;}
+        button, .btn{background:#005C99;color:#fff;padding:0.5rem 1rem;border:none;border-radius:4px;cursor:pointer;}
+        button:hover, .btn:hover{background:#004b80;}
+        table{width:100%;border-collapse:collapse;}
+        th,td{padding:0.75rem;border:1px solid #ddd;text-align:left;}
+        th{background:#e0f2ff;}
+        form input, form select{width:100%;padding:0.5rem;margin-bottom:1rem;border:1px solid #ccc;border-radius:3px;}
+      </style>
+    {% endblock %}
+  </head>
+  <body>
+  {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div style="
+                background-color: {% if label == 'success' %}#d4edda{% elseif label == 'error' %}#f8d7da{% elseif label == 'warning' %}#fff3cd{% endif %};
+                color: {% if label == 'success' %}#155724{% elseif label == 'error' %}#721c24{% elseif label == 'warning' %}#856404{% endif %};
+                border: 1px solid #ccc;
+                padding: 0.75rem;
+                border-radius: 4px;
+                margin-bottom: 1rem;">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+    <header>
+      <nav class="container">
+        <a href="{{ path('app_home') }}" class="{{ app.request.attributes.get('_route') == 'app_home' ? 'active' : '' }}">🏠 Accueil</a>
+        {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+          <a href="{{ path('app_categorie_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_categorie' ? 'active' : '' }}">📚 Catégories</a>
+          <a href="{{ path('app_lunette_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_lunette' ? 'active' : '' }}">🕶️ Lunettes</a>
+          <a href="{{ path('app_commande_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_commande' ? 'active' : '' }}">📦 Commandes</a>
         {% endif %}
-        {% block body %}{% endblock %}
-    </body>
+        <span style="float:right;">
+          {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+            {{ app.user.email }} ({{ is_granted('ROLE_ADMIN') ? 'admin' : 'user' }})
+            <a href="{{ path('app_logout') }}" class="btn">Déconnexion</a>
+          {% else %}
+            <a href="{{ path('app_login') }}" class="btn">Connexion</a>
+            <a href="{{ path('app_register') }}" class="btn">Inscription</a>
+          {% endif %}
+        </span>
+      </nav>
+    </header>
+
+    <div class="container">
+      {% for message in app.flashes('success') %}
+        <div style="background:#d4edda;color:#155724;padding:0.75rem;border-radius:4px;margin-bottom:1rem;">{{ message }}</div>
+      {% endfor %}
+      {% block body %}{% endblock %}
+    </div>
+
+    <footer>&copy; {{ "now"|date("Y") }} Opticien App</footer>
+    {% block javascripts %}{% endblock %}
+  </body>
 </html>

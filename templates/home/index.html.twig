@@ -1,13 +1,11 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Accueil{% endblock %}
-
+{% block title %}Accueil — Opticien{% endblock %}
 {% block body %}
-    <h1>Bienvenue 👋</h1>
-    <p>Que souhaitez-vous faire ?</p>
-
-    <ul>
-        <li><a href="{{ path('app_categorie_index') }}">Gérer les catégories</a></li>
-        <li><a href="{{ path('app_lunette_index') }}">Gérer les lunettes</a></li>
-    </ul>
+  <h1>Bienvenue 👋</h1>
+  <p>Que souhaitez-vous faire ?</p>
+  <ul>
+    <li><a href="{{ path('app_categorie_index') }}">Gérer les catégories</a></li>
+    <li><a href="{{ path('app_lunette_index') }}">Gérer les lunettes</a></li>
+    <li><a href="{{ path('app_commande_index') }}">Voir les commandes</a></li>
+  </ul>
 {% endblock %}

@@ -53,6 +53,8 @@ final class CategorieController extends AbstractController
     #[Route('/{id}/edit', name: 'app_categorie_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Categorie $categorie, EntityManagerInterface $entityManager): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $form = $this->createForm(CategorieForm::class, $categorie);
         $form->handleRequest($request);
 

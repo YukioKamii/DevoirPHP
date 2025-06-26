@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Commande;
-use App\Form\CommandeForm;
+use App\Form\CommandeType;
 use App\Repository\CommandeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,8 +17,16 @@ final class CommandeController extends AbstractController
     #[Route(name: 'app_commande_index', methods: ['GET'])]
     public function index(CommandeRepository $commandeRepository): Response
     {
+        $user = $this->getUser();
+
+        if ($this->isGranted('ROLE_ADMIN')) {
+            $commandes = $commandeRepository->findAll();
+        } else {
+            $commandes = $commandeRepository->findBy(['user' => $user]);
+        }
+
         return $this->render('commande/index.html.twig', [
-            'commandes' => $commandeRepository->findAll(),
+            'commandes' => $commandes,
         ]);
     }
 
@@ -26,19 +34,23 @@ final class CommandeController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $commande = new Commande();
-        $form = $this->createForm(CommandeForm::class, $commande);
+        $form = $this->createForm(CommandeType::class, $commande);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // 🔥 Associer l'utilisateur connecté à la commande
+            $commande->setUser($this->getUser());
+            $commande->setDate(new \DateTimeImmutable());
+
             $entityManager->persist($commande);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_commande_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_commande_index');
         }
 
         return $this->render('commande/new.html.twig', [
             'commande' => $commande,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
@@ -50,21 +62,31 @@ final class CommandeController extends AbstractController
         ]);
     }
 
+    #[Route('/mes-commandes', name: 'app_commande_user', methods: ['GET'])]
+    public function userIndex(CommandeRepository $commandeRepository): Response
+    {
+        $user = $this->getUser();
+
+        return $this->render('commande/user_index.html.twig', [
+            'commandes' => $commandeRepository->findBy(['user' => $user]),
+        ]);
+    }
+
     #[Route('/{id}/edit', name: 'app_commande_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Commande $commande, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(CommandeForm::class, $commande);
+        $form = $this->createForm(CommandeType::class, $commande);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_commande_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_commande_index');
         }
 
         return $this->render('commande/edit.html.twig', [
             'commande' => $commande,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
@@ -76,6 +98,6 @@ final class CommandeController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_commande_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_commande_index');
     }
 }

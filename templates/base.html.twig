@@ -21,6 +21,12 @@
                 <div style="margin-left:auto;">
                     {% if app.user %}
                         👤 {{ app.user.email }}
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <span style="color: red; font-weight: bold;">(Admin)</span>
+                        {% else %}
+                            <span style="color: blue; font-weight: bold;">(Utilisateur)</span>
+                        {% endif %}
+                        <a href="{{ path('app_commande_user') }}">📦 Mes commandes</a>
                         <a href="{{ path('app_logout') }}" style="margin-left: 1em;">🚪 Déconnexion</a>
                     {% endif %}
                 </div>

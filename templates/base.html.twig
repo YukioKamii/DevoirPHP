@@ -12,6 +12,20 @@
         {% endblock %}
     </head>
     <body>
+        {% if app.user %}
+            <nav style="padding: 1em; background: #eee; display: flex; gap: 1em;">
+                <a href="{{ path('app_home') }}">🏠 Accueil</a>
+                <a href="{{ path('app_categorie_index') }}">📦 Catégories</a>
+                <a href="{{ path('app_lunette_index') }}">🕶 Lunettes</a>
+
+                <div style="margin-left:auto;">
+                    {% if app.user %}
+                        👤 {{ app.user.email }}
+                        <a href="{{ path('app_logout') }}" style="margin-left: 1em;">🚪 Déconnexion</a>
+                    {% endif %}
+                </div>
+            </nav>
+        {% endif %}
         {% block body %}{% endblock %}
     </body>
 </html>

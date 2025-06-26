@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Lunette{% endblock %}
+
+{% block body %}
+    <h1>Create new Lunette</h1>
+
+    {{ include('lunette/_form.html.twig') }}
+
+    <a href="{{ path('app_lunette_index') }}">back to list</a>
+{% endblock %}
